@@ -8,4 +8,10 @@
     <string name="copyright">Копирайт</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="station_from">Станция отправления</string>
+    <string name="station_to">Станция прибытия</string>
+    <string name="date_departure">Дата отправления</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
