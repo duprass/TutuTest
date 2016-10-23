@@ -19,6 +19,8 @@ import android.view.inputmethod.InputMethodManager;
 import com.rolea.tututest.helpers.ToolbarManipulation;
 import com.rolea.tututest.model.Station;
 
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ChooseStationFragment.OnChooseStationListener,
         ToolbarManipulation, SearchStationFragment.OnSearchFragmentInteractionListener
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity
     private Fragment fragment;
     private NavigationView navigationView;
     private String name;
-
+    private HashMap<Integer, Station> stations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +41,9 @@ public class MainActivity extends AppCompatActivity
 
         initializeToolbar();
         initializeNavigationView();
+        stations = new HashMap<>();
         setFirstFragment();
+
     }
 
     private void initializeToolbar() {
@@ -185,8 +189,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStationChoose(int Type) {
         fragment = SearchStationFragment.newInstance(Type);
-        name = fragment.getClass().getName();
+        name = String.format("%s%s", fragment.getClass().getName(), Type);
         replaceFragment(fragment, name);
+    }
+
+    @Override
+    public String getStationFrom() {
+        return  stations.get(0)== null? null:stations.get(0).getStationTitle();
+    }
+
+    @Override
+    public String getStationTo() {
+        return stations.get(1)== null? null:stations.get(1).getStationTitle();
     }
 
     @Override
@@ -207,8 +221,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onChooseInteraction(Station item) {
-
+    public void onChooseInteraction(Station item, int type) {
+        stations.put(type, item);
+        fragment = ChooseStationFragment.newInstance("bla", "bla");
+        name = fragment.getClass().getName();
+        replaceFragment(fragment, name);
     }
 
     @Override

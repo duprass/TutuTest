@@ -128,7 +128,7 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
             new CitiesParse().execute();
         }
         else {
-            adapter = new StationRecyclerViewAdapter(listCities.getCitiesByType(type), mListener);
+            adapter = new StationRecyclerViewAdapter(listCities.getCitiesByType(type), type, mListener);
             recyclerView.setAdapter(adapter);
         }
         return view;
@@ -186,7 +186,7 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
         @Override
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
-            adapter = new StationRecyclerViewAdapter(listCities.getCitiesByType(type), mListener);
+            adapter = new StationRecyclerViewAdapter(listCities.getCitiesByType(type), type, mListener);
             recyclerView.setAdapter(adapter);
             //set recycler view
         }
@@ -204,7 +204,7 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
      */
     public interface OnSearchFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onChooseInteraction(Station item);
+        void onChooseInteraction(Station item, int type);
         void onLoadStationList(int Type);
     }
 

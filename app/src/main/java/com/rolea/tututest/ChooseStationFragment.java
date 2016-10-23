@@ -71,6 +71,20 @@ public class ChooseStationFragment extends Fragment {
         View view = inflater.inflate(R.layout.content_main, container, false);
 
         mToolbarCallback.showBackButton(false);
+        InitializeView(view);
+
+        String stationFrom = mListener.getStationFrom();
+        String stationTo = mListener.getStationTo();
+        if (stationFrom != null){
+            buttonStationFrom.setText(stationFrom);
+        }
+        if (stationTo != null){
+            buttonStationTo.setText(stationTo);
+        }
+        return view;
+    }
+
+    private void InitializeView(View view) {
         buttonStationTo = (Button) view.findViewById(R.id.input_station_to);
         buttonStationFrom = (Button) view.findViewById(R.id.input_station_from);
         buttonDateDeparture = (Button) view.findViewById(R.id.date_departure_button);
@@ -87,7 +101,6 @@ public class ChooseStationFragment extends Fragment {
                 mListener.onStationChoose(1);
             }
         });
-        return view;
     }
 
 
@@ -123,5 +136,7 @@ public class ChooseStationFragment extends Fragment {
     public interface OnChooseStationListener {
         // TODO: Update argument type and name
         void onStationChoose(int Type);
+        String getStationFrom();
+        String getStationTo();
     }
 }

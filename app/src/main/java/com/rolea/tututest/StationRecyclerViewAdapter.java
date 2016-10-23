@@ -16,12 +16,14 @@ import java.util.List;
  */
 public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecyclerViewAdapter.ViewHolder> {
 
+    private final int type;
     private  List<City> mOriginalValues;
     private  List<ListItem> mValues;
     private final SearchStationFragment.OnSearchFragmentInteractionListener mListener;
 
-    public StationRecyclerViewAdapter(List<City> items, SearchStationFragment.OnSearchFragmentInteractionListener listener) {
+    public StationRecyclerViewAdapter(List<City> items, int type, SearchStationFragment.OnSearchFragmentInteractionListener listener) {
         mOriginalValues = items;
+        this.type = type;
         mListener = listener;
         initializeList(mOriginalValues);
     }
@@ -67,7 +69,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
                     if (null != mListener) {
                         // Notify the active callbacks interface (the activity, if the
                         // fragment is attached to one) that an item has been selected.
-                        mListener.onChooseInteraction(item.getSation());
+                        mListener.onChooseInteraction(item.getSation(), type);
                     }
                 }
             });
