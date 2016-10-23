@@ -83,8 +83,6 @@ public class MainActivity extends AppCompatActivity
             onBackPressed();
         }
 
-        //noinspection SimplifiableIfStatement
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -172,8 +170,6 @@ public class MainActivity extends AppCompatActivity
             }
             ft.replace(R.id.main_content, fragment, fragmentTag);
 
-//                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-
             ft.addToBackStack(backStateName);
             ft.commit();
         }
@@ -181,7 +177,6 @@ public class MainActivity extends AppCompatActivity
 
     private void replaceFragment(Fragment fragment, String name) {
         replaceFragment(fragment, name, -1, -1);
-
     }
 
 
@@ -224,6 +219,13 @@ public class MainActivity extends AppCompatActivity
     public void onChooseInteraction(Station item, int type) {
         stations.put(type, item);
         fragment = ChooseStationFragment.newInstance("bla", "bla");
+        name = fragment.getClass().getName();
+        replaceFragment(fragment, name);
+    }
+
+    @Override
+    public void onDetailStationViewInteraction(Station station) {
+        fragment = DetailStationFragment.newInstance(station);
         name = fragment.getClass().getName();
         replaceFragment(fragment, name);
     }

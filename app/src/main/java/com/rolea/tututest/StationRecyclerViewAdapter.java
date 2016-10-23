@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.rolea.tututest.model.City;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * TODO: Replace the implementation with code for your data type.
  */
-public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecyclerViewAdapter.ViewHolder> {
+public class StationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final int type;
     private  List<City> mOriginalValues;
@@ -39,31 +40,39 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ListItem.TYPE_HEADER) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_search_station, parent, false);
-            return new ViewHolder(view);
-        }
-        else {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_header_item, parent, false);
             return new ViewHolder(view);
         }
+        else {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_search_station, parent, false);
+            return new StationViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         int viewType = getItemViewType(position);
 
         if (viewType == ListItem.TYPE_HEADER){
             HeaderItem item = (HeaderItem) mValues.get(position);
-            holder.mContentView.setText(item.getCity().getCityTitle());
+            ViewHolder mholder = (ViewHolder)holder;
+            mholder.mContentView.setText(item.getCity().getCityTitle());
         }
         if (viewType == ListItem.TYPE_STATION){
             final StationItem item = (StationItem) mValues.get(position);
-            holder.mContentView.setText(item.getSation().getStationTitle());
-            holder.mView.setOnClickListener(new View.OnClickListener() {
+            StationViewHolder mholder = (StationViewHolder)holder;
+            mholder.mContentView.setText(item.getSation().getStationTitle());
+            mholder.mImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onDetailStationViewInteraction(item.getSation());
+                }
+            });
+            mholder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (null != mListener) {
@@ -85,6 +94,24 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<StationRecy
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public class StationViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView mContentView;
+        private final ImageView mImageView;
+
+        public StationViewHolder(View view) {
+            super(view);
+            mView = view;
+            mContentView = (TextView) view.findViewById(R.id.title_item);
+            mImageView = (ImageView) view.findViewById(R.id.info_item);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " '" + mContentView.getText() + "'";
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

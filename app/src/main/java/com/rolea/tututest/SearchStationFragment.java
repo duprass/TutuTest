@@ -67,11 +67,6 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
         }
     }
 
-    /*@Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem mSearchMenuItem = menu.findItem(R.id.mi_search);
-        SearchView searchView = (SearchView) mSearchMenuItem.getActionView();
-    }*/
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.search_menu, menu);
@@ -205,6 +200,7 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
     public interface OnSearchFragmentInteractionListener {
         // TODO: Update argument type and name
         void onChooseInteraction(Station item, int type);
+        void onDetailStationViewInteraction(Station station);
         void onLoadStationList(int Type);
     }
 
