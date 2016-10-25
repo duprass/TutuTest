@@ -2,8 +2,14 @@ package com.rolea.tututest.helpers;
 
 import android.view.View;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.rolea.tututest.model.Station;
+
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by rolea on 10/25/2016.
@@ -25,4 +31,12 @@ public class Util {
         }
     }
 
+    public static String getHashMapStationJson(HashMap<Integer, Station> stations) {
+
+        Gson gson = new Gson();
+        Type listOfTestObject = new TypeToken<HashMap<Integer, Station>>() {
+        }.getType();
+        String s = gson.toJson(stations, listOfTestObject);
+        return s;
+    }
 }

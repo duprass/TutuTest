@@ -62,9 +62,11 @@ public class ScheduleFragment extends Fragment {
         InitializeView(view);
 
         calendar = Calendar.getInstance();
+        // handle orientation changes
         if (savedInstanceState == null) {
             dateDeparture = calendar.getTime();
         } else {
+            // restore selected date
             calendar.setTimeInMillis(savedInstanceState.getLong(SELECTED_DATE_KEY));
             dateDeparture = calendar.getTime();
         }
@@ -125,8 +127,8 @@ public class ScheduleFragment extends Fragment {
             calendar = Calendar.getInstance();
             dateDeparture = calendar.getTime();
         }
+        // save selected state
         outState.putLong(SELECTED_DATE_KEY, dateDeparture.getTime());
-
     }
 
     @Override

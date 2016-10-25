@@ -129,9 +129,9 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
             View view = inflater.inflate(R.layout.fragment_statioin_list, container, false);
             setHasOptionsMenu(true);
             mToolbarCallback.showBackButton(true);
-        // Set the adapter
             initializeViews(view);
 
+            // handle orientaition changes
             if (savedInstanceState == null) {
                 searchQuery = "";
                 searchQueryToRestore = "";
@@ -166,6 +166,9 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
     }
 
+    /**
+     * Restore State of SearchView
+     */
     private void restoreSearchView() {
         searchView.onActionViewExpanded();
         searchView.post(new Runnable() {
@@ -215,6 +218,8 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
         super.onDetach();
         mListener = null;
         mToolbarCallback = null;
+
+        // cancel Task if it's runnig
         if (isTaskRunning()) {
             loadCitysyncTask.cancel(true);
         }
@@ -230,6 +235,11 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
         outState.putString(SEARCH_QUERY_KEY, searchQuery);
     }
 
+    /**
+     * Load json from allStations.json
+     *
+     * @return json String with info from file
+     */
     public String loadJSONFromAsset() {
         String json;
         try {
@@ -246,23 +256,11 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
         return json;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnSearchFragmentInteractionListener {
-        // TODO: Update argument type and name
+
         void onChooseInteraction(Station item, int type);
 
         void onDetailStationViewInteraction(Station station);
-
-        void onLoadStationList(int Type);
     }
 
     private class CitiesParse extends AsyncTask<Void, Void, Void> {
@@ -276,7 +274,7 @@ public class SearchStationFragment extends Fragment implements SearchView.OnQuer
 
         @Override
         protected void onPreExecute() {
-            // show progress bar
+
         }
 
         @Override

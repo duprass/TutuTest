@@ -30,12 +30,17 @@ public class MainActivity extends AppCompatActivity
 {
     private static final String ARG_SELECTED_STATIONS_KEY = "selected-stations";
 
+    // Views
     private DrawerLayout drawer;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private Toolbar toolbar;
     private Fragment fragment;
     private NavigationView navigationView;
+
+    //Unique name of fragment
     private String name;
+
+    // Chosen Station according to stationFrom/StationTo
     private HashMap<Integer, Station> stations;
 
     @Override
@@ -50,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         // handle orientations changes
         if (savedInstanceState == null) {
             setFirstFragment();
-        } else {
+        } else { // i orientation was changed, then restore state of activity
             // set stations
             Gson gson = new Gson();
             Type listOfTestObject = new TypeToken<HashMap<Integer, Station>>() {
@@ -68,27 +73,33 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                // if it's first fragment then exit from app
+                if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
+                    finish();
+                } else { //otherwise return fragment from backstack
+                    getSupportFragmentManager().popBackStackImmediate();
+                }
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if (mActionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         if (id == android.R.id.home) {
-            // Home/Up logic handled by onBackPressed implementation
+
             onBackPressed();
         }
 
@@ -96,7 +107,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -117,8 +127,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initializeNavigationView() {
-
-
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mActionBarDrawerToggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
@@ -162,22 +170,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setFirstFragment() {
-        Fragment registerTemplateFragment;
+        Fragment firstfragment;
 
-        registerTemplateFragment = ScheduleFragment.newInstance();
-        name = registerTemplateFragment.getClass().getName();
+        firstfragment = ScheduleFragment.newInstance();
+        name = firstfragment.getClass().getName();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_content, registerTemplateFragment, name).addToBackStack(name).commitAllowingStateLoss();
+                .replace(R.id.main_content, firstfragment, name).addToBackStack(name).commitAllowingStateLoss();
     }
 
     private void replaceFragment(Fragment fragment, String name, int enter, int ext) {
         String backStateName = name;
         String fragmentTag = backStateName;
 
+        // get ragment from backstack if there is
         FragmentManager manager = getSupportFragmentManager();
         boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
 
-        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //fragment not in back stack, create it.
+        //fragment not in back stack, create it.
+        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) {
             FragmentTransaction ft = manager.beginTransaction();
             if (enter != -1 && ext != -1) {
                 ft.setCustomAnimations(enter, ext);
@@ -195,14 +205,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Gson gson = new Gson();
-        Type listOfTestObject = new TypeToken<HashMap<Integer, Station>>() {
-        }.getType();
-        String s = gson.toJson(stations, listOfTestObject);
-        outState.putString(ARG_SELECTED_STATIONS_KEY, s);
+        outState.putString(ARG_SELECTED_STATIONS_KEY, Util.getHashMapStationJson(stations));
         super.onSaveInstanceState(outState);
     }
 
+    /**
+     * Method to move on Search Station Screen
+     *
+     * @param Type Type of Search Station Screen
+     */
     @Override
     public void onStationChoose(int Type) {
         fragment = SearchStationFragment.newInstance(Type);
@@ -225,36 +236,45 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle(title);
     }
 
+    /**
+     *  Method to control whether show back or haburger button on toolbar
+     * @param show if show is true then show back buton, otherwis habmurger
+     */
     @Override
     public void showBackButton(boolean show) {
         if (show) {
             mActionBarDrawerToggle.setDrawerIndicatorEnabled(!show);
             getSupportActionBar().setDisplayHomeAsUpEnabled(show);
         } else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            mActionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(show);
+            mActionBarDrawerToggle.setDrawerIndicatorEnabled(!show);
         }
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
+    /**
+     * Method to choose station stations and returhn on schedule screen
+     * @param item chosen station
+     * @param type type of SearchSctations screen: Stations from or Staions To
+     */
     @Override
     public void onChooseInteraction(Station item, int type) {
+        // add chosen stations
         stations.put(type, item);
+        // replace fragments
         fragment = ScheduleFragment.newInstance();
         name = fragment.getClass().getName();
         replaceFragment(fragment, name);
     }
 
+    /**
+     * Method to move on screen with detail info about station
+     * @param station
+     */
     @Override
     public void onDetailStationViewInteraction(Station station) {
         fragment = DetailStationFragment.newInstance(station);
         name = fragment.getClass().getName();
         replaceFragment(fragment, name);
     }
-
-    @Override
-    public void onLoadStationList(int Type) {
-
-    }
-
 }
