@@ -21,15 +21,11 @@ import com.rolea.tututest.model.Station;
  * create an instance of this fragment.
  */
 public class DetailStationFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private ToolbarManipulation mToolbarCallback;
+    private static final String ARG_STATION = "arg-station";
     // TODO: Rename and change types of parameters
     private Station station;
 
-    private ToolbarManipulation mListener;
+    private ToolbarManipulation mToolbarCallback;
     private TextView country;
 
     public DetailStationFragment() {
@@ -47,7 +43,7 @@ public class DetailStationFragment extends Fragment {
     public static DetailStationFragment newInstance(Station station) {
         DetailStationFragment fragment = new DetailStationFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, new Gson().toJson(station));
+        args.putString(ARG_STATION, new Gson().toJson(station));
 
         fragment.setArguments(args);
         return fragment;
@@ -58,7 +54,7 @@ public class DetailStationFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-           station = new Gson().fromJson(getArguments().getString(ARG_PARAM1), com.rolea.tututest.model.Station.class);
+            station = new Gson().fromJson(getArguments().getString(ARG_STATION), com.rolea.tututest.model.Station.class);
 
         }
     }
@@ -68,8 +64,8 @@ public class DetailStationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_detail_station, container, false);
-        mListener.showBackButton(true);
-        mListener.setTitle(station.getStationTitle());
+        mToolbarCallback.showBackButton(true);
+        mToolbarCallback.setTitle(station.getStationTitle());
         country = (TextView) view.findViewById(R.id.title_info);
         String Info = getInfo();
         country.setText(Info);
@@ -82,7 +78,7 @@ public class DetailStationFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof ToolbarManipulation) {
-            mListener = (ToolbarManipulation) context;
+            mToolbarCallback = (ToolbarManipulation) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -92,7 +88,7 @@ public class DetailStationFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mToolbarCallback = null;
     }
 
 
