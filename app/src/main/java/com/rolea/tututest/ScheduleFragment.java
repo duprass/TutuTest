@@ -7,51 +7,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 
 import com.rolea.tututest.helpers.ToolbarManipulation;
+import com.rolea.tututest.helpers.Util;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link OnChooseStationListener} interface
  * to handle interaction events.
- * Use the {@link ChooseStationFragment#newInstance} factory method to
+ * Use the {@link ScheduleFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChooseStationFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class ScheduleFragment extends Fragment {
+    private static final String SELECTED_DATE_KEY = "selected_day";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnChooseStationListener mListener;
     private Button buttonDateDeparture;
     private Button buttonStationFrom;
     private Button buttonStationTo;
     private ToolbarManipulation mToolbarCallback;
+    private CalendarView calendarView;
+    private Date dateDeparture;
+    private Calendar calendar;
 
-    public ChooseStationFragment() {
+    public ScheduleFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChooseStationFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ChooseStationFragment newInstance(String param1, String param2) {
-        ChooseStationFragment fragment = new ChooseStationFragment();
+
+    public static ScheduleFragment newInstance() {
+        ScheduleFragment fragment = new ScheduleFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,10 +51,6 @@ public class ChooseStationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -73,6 +61,19 @@ public class ChooseStationFragment extends Fragment {
         mToolbarCallback.showBackButton(false);
         InitializeView(view);
 
+        calendar = Calendar.getInstance();
+        if (savedInstanceState == null) {
+            dateDeparture = calendar.getTime();
+        } else {
+            calendar.setTimeInMillis(savedInstanceState.getLong(SELECTED_DATE_KEY));
+            dateDeparture = calendar.getTime();
+        }
+
+        setValuesToViews();
+        return view;
+    }
+
+    private void setValuesToViews() {
         String stationFrom = mListener.getStationFrom();
         String stationTo = mListener.getStationTo();
         if (stationFrom != null){
@@ -81,7 +82,8 @@ public class ChooseStationFragment extends Fragment {
         if (stationTo != null){
             buttonStationTo.setText(stationTo);
         }
-        return view;
+        setDateText();
+        calendarView.setDate(dateDeparture.getTime());
     }
 
     private void InitializeView(View view) {
@@ -92,17 +94,35 @@ public class ChooseStationFragment extends Fragment {
         buttonStationFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onStationChoose(0);
+                mListener.onStationChoose(Util.TYPE_STATION_FROM);
             }
         });
         buttonStationTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onStationChoose(1);
+                mListener.onStationChoose(Util.TYPE_STATION_TO);
+            }
+        });
+        calendarView = (CalendarView) view.findViewById(R.id.calendarView);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+                calendar.set(year, month, dayOfMonth);
+                dateDeparture = calendar.getTime();
+                setDateText();
             }
         });
     }
 
+    private void setDateText() {
+        buttonDateDeparture.setText(getString(R.string.date_departure) + ":" + Util.getFormatDate(dateDeparture));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(SELECTED_DATE_KEY, dateDeparture.getTime());
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -123,18 +143,13 @@ public class ChooseStationFragment extends Fragment {
         mToolbarCallback = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        mToolbarCallback.setTitle(getString(R.string.schedule));
+    }
+
     public interface OnChooseStationListener {
-        // TODO: Update argument type and name
         void onStationChoose(int Type);
         String getStationFrom();
         String getStationTo();

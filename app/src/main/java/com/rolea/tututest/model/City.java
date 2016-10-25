@@ -18,6 +18,7 @@ public class City {
 
     private Station[] stations;
 
+
     public City() {
     }
 
@@ -37,6 +38,10 @@ public class City {
 
     public void setCityId(String cityId) {
         this.cityId = cityId;
+    }
+
+    public String getCountryCityTitle() {
+        return getCountryTitle() + ", " + getCityTitle();
     }
 
     public String getCityTitle() {

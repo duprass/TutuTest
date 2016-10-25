@@ -18,9 +18,9 @@ import java.util.List;
 public class StationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final int type;
+    private final SearchStationFragment.OnSearchFragmentInteractionListener mListener;
     private  List<City> mOriginalValues;
     private  List<ListItem> mValues;
-    private final SearchStationFragment.OnSearchFragmentInteractionListener mListener;
 
     public StationRecyclerViewAdapter(List<City> items, int type, SearchStationFragment.OnSearchFragmentInteractionListener listener) {
         mOriginalValues = items;
@@ -60,7 +60,7 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         if (viewType == ListItem.TYPE_HEADER){
             HeaderItem item = (HeaderItem) mValues.get(position);
             ViewHolder mholder = (ViewHolder)holder;
-            mholder.mContentView.setText(item.getCity().getCityTitle());
+            mholder.mContentView.setText(item.getCity().getCountryCityTitle());
         }
         if (viewType == ListItem.TYPE_STATION){
             final StationItem item = (StationItem) mValues.get(position);
@@ -94,6 +94,30 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public void filter(String text) {
+        mValues.clear();
+        if (text.isEmpty()) {
+            initializeList(mOriginalValues);
+        } else {
+            List<ListItem> filterResults = new ArrayList<>();
+
+            for (City city : mOriginalValues) {
+                boolean cityAdded = false;
+                for (com.rolea.tututest.model.Station station : city.getStations()) {
+                    if (station.getStationTitle().toLowerCase().contains(text)) {
+                        if (!cityAdded) {
+                            cityAdded = true;
+                            filterResults.add(new HeaderItem(city));
+                        }
+                        filterResults.add(new StationItem(station));
+                    }
+                }
+            }
+            mValues = filterResults;
+        }
+        notifyDataSetChanged();
     }
 
     public class StationViewHolder extends RecyclerView.ViewHolder {
@@ -130,29 +154,6 @@ public class StationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
-    public void filter(String text){
-        mValues.clear();
-        if (text.isEmpty()){
-            initializeList(mOriginalValues);
-        } else {
-            List<ListItem> filterResults = new ArrayList<>();
-
-            for (City city:mOriginalValues){
-                boolean cityAdded = false;
-                for (com.rolea.tututest.model.Station station:city.getStations()){
-                    if (station.getStationTitle().toLowerCase().contains(text)){
-                        if (!cityAdded){
-                            cityAdded = true;
-                            filterResults.add(new HeaderItem(city));
-                        }
-                        filterResults.add(new StationItem(station));
-                    }
-                }
-            }
-            mValues = filterResults;
-        }
-        notifyDataSetChanged();
-    }
     private abstract class ListItem{
         public static final int TYPE_HEADER = 0;
         public static final int TYPE_STATION = 1;

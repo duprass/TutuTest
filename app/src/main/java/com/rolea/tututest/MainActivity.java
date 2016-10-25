@@ -2,29 +2,33 @@ package com.rolea.tututest;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.rolea.tututest.helpers.ToolbarManipulation;
+import com.rolea.tututest.helpers.Util;
 import com.rolea.tututest.model.Station;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ChooseStationFragment.OnChooseStationListener,
+        implements NavigationView.OnNavigationItemSelectedListener, ScheduleFragment.OnChooseStationListener,
         ToolbarManipulation, SearchStationFragment.OnSearchFragmentInteractionListener
 {
+    private static final String ARG_SELECTED_STATIONS_KEY = "selected-stations";
 
     private DrawerLayout drawer;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
@@ -42,7 +46,18 @@ public class MainActivity extends AppCompatActivity
         initializeToolbar();
         initializeNavigationView();
         stations = new HashMap<>();
-        setFirstFragment();
+
+        // handle orientations changes
+        if (savedInstanceState == null) {
+            setFirstFragment();
+        } else {
+            // set stations
+            Gson gson = new Gson();
+            Type listOfTestObject = new TypeToken<HashMap<Integer, Station>>() {
+            }.getType();
+
+            stations = gson.fromJson(savedInstanceState.getString(ARG_SELECTED_STATIONS_KEY), listOfTestObject);
+        }
 
     }
 
@@ -61,12 +76,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -95,9 +104,13 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_schedule) {
             // Handle the camera action
+            fragment = ScheduleFragment.newInstance();
+            name = fragment.getClass().getName();
         } else if (id == R.id.nav_copyright) {
-
+            fragment = CopyrightFragment.newInstance("", "");
+            name = fragment.getClass().getName();
         }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -113,9 +126,7 @@ public class MainActivity extends AppCompatActivity
             public void onDrawerClosed(View drawerView) {
                 // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
                 super.onDrawerClosed(drawerView);
-                InputMethodManager inputMethodManager = (InputMethodManager)
-                        getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                hideKeyboard();
 
                 if (fragment !=null){
                     replaceFragment(fragment, name);
@@ -127,9 +138,7 @@ public class MainActivity extends AppCompatActivity
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
                 super.onDrawerOpened(drawerView);
-                InputMethodManager inputMethodManager = (InputMethodManager)
-                        getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                hideKeyboard();
             }
         };
         drawer.addDrawerListener(mActionBarDrawerToggle);
@@ -138,7 +147,6 @@ public class MainActivity extends AppCompatActivity
         mActionBarDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.d("Toogle", "clicked");
                 onBackPressed();
             }
         });
@@ -147,10 +155,16 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    private void hideKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+    }
+
     private void setFirstFragment() {
         Fragment registerTemplateFragment;
 
-        registerTemplateFragment = ChooseStationFragment.newInstance("bla", "bla");
+        registerTemplateFragment = ScheduleFragment.newInstance();
         name = registerTemplateFragment.getClass().getName();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_content, registerTemplateFragment, name).addToBackStack(name).commitAllowingStateLoss();
@@ -179,7 +193,15 @@ public class MainActivity extends AppCompatActivity
         replaceFragment(fragment, name, -1, -1);
     }
 
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Gson gson = new Gson();
+        Type listOfTestObject = new TypeToken<HashMap<Integer, Station>>() {
+        }.getType();
+        String s = gson.toJson(stations, listOfTestObject);
+        outState.putString(ARG_SELECTED_STATIONS_KEY, s);
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public void onStationChoose(int Type) {
@@ -190,17 +212,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public String getStationFrom() {
-        return  stations.get(0)== null? null:stations.get(0).getStationTitle();
+        return stations.get(Util.TYPE_STATION_FROM) == null ? null : stations.get(Util.TYPE_STATION_FROM).getStationTitle();
     }
 
     @Override
     public String getStationTo() {
-        return stations.get(1)== null? null:stations.get(1).getStationTitle();
+        return stations.get(Util.TYPE_STATION_TO) == null ? null : stations.get(Util.TYPE_STATION_TO).getStationTitle();
     }
 
     @Override
     public void setTitle(String title) {
-
+        toolbar.setTitle(title);
     }
 
     @Override
@@ -218,7 +240,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onChooseInteraction(Station item, int type) {
         stations.put(type, item);
-        fragment = ChooseStationFragment.newInstance("bla", "bla");
+        fragment = ScheduleFragment.newInstance();
         name = fragment.getClass().getName();
         replaceFragment(fragment, name);
     }
@@ -234,7 +256,5 @@ public class MainActivity extends AppCompatActivity
     public void onLoadStationList(int Type) {
 
     }
-
-
 
 }

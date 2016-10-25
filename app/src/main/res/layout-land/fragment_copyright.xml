@@ -1,56 +1,69 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    tools:context="com.rolea.tututest.CopyrightFragment">
+    android:fillViewport="true">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-    android:layout_height="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center_vertical"
-
-        android:orientation="vertical">
+        android:padding="@dimen/activity_horizontal_margin">
 
         <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/profile_image"
             android:layout_width="@dimen/photo_size"
             android:layout_height="@dimen/photo_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_margin="@dimen/icon_margin"
             android:src="@drawable/photo"
             app:civ_border_color="@color/colorAccentLight"
             app:civ_border_width="@dimen/bortder_width" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/copyright_content"
-        android:textAlignment="center" />
 
         <TextView
+            android:id="@+id/textView_copyright"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/profile_image"
+            android:layout_margin="@dimen/text_margin"
+            android:layout_toRightOf="@+id/profile_image"
+            android:text="@string/copyright_content"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/textView_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_copyright"
             android:layout_margin="@dimen/text_margin"
+            android:layout_toRightOf="@+id/profile_image"
             android:autoLink="email"
             android:text="@string/email_title"
             android:textAlignment="center" />
 
         <TextView
+            android:id="@+id/textView_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_email"
             android:layout_margin="@dimen/text_margin"
+            android:layout_toRightOf="@+id/profile_image"
             android:autoLink="phone"
             android:text="@string/phone_title"
             android:textAlignment="center" />
 
         <TextView
+            android:id="@+id/textView_github"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_phone"
             android:layout_margin="@dimen/text_margin"
+            android:layout_toRightOf="@+id/profile_image"
             android:autoLink="web"
             android:text="@string/github_title"
             android:textAlignment="center" />
-    </LinearLayout>
+    </RelativeLayout>
 </ScrollView>
