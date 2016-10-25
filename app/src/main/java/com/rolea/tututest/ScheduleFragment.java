@@ -121,7 +121,12 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if (dateDeparture == null) {
+            calendar = Calendar.getInstance();
+            dateDeparture = calendar.getTime();
+        }
         outState.putLong(SELECTED_DATE_KEY, dateDeparture.getTime());
+
     }
 
     @Override

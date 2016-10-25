@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity
             fragment = ScheduleFragment.newInstance();
             name = fragment.getClass().getName();
         } else if (id == R.id.nav_copyright) {
-            fragment = CopyrightFragment.newInstance("", "");
+            fragment = CopyrightFragment.newInstance();
             name = fragment.getClass().getName();
         }
 

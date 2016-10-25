@@ -40,7 +40,10 @@
             android:id="@+id/date_departure_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorAccentLight"
+            android:clickable="false"
             android:text="@string/date_departure"
+            android:textColor="@android:color/white"
             />
 
         <CalendarView
