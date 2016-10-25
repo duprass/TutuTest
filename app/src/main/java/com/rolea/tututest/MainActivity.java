@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-
+            hideKeyboard();
             if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 // if it's first fragment then exit from app
                 if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
